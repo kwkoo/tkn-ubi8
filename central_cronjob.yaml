@@ -1,0 +1,26 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: pr-cleaner
+spec:
+  schedule: "*/5 * * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: pr-cleaner
+          containers:
+          - name: tkn
+            image: ghcr.io/kwkoo/tkn-ubi8:0.13.1
+            imagePullPolicy: IfNotPresent
+            command:
+              - bash
+            args:
+              - "-c"
+              - |
+                for proj in project1 project2 project3; do
+                  tkn pr delete -n $proj -f --keep 3
+                done
+          restartPolicy: OnFailure

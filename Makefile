@@ -1,3 +1,4 @@
+PROJ=infra
 VERSION=0.13.1
 IMAGE_NAME=ghcr.io/kwkoo/tkn-ubi8:$(VERSION)
 URL=https://mirror.openshift.com/pub/openshift-v4/clients/pipeline/0.13.1/tkn-linux-amd64-0.13.1.tar.gz
@@ -25,12 +26,13 @@ clean:
 	-rm -rf $(BASE)/download
 
 cron:
-	-oc create role \
-	  tkn \
+	-oc create sa pr-cleaner -n $(PROJ)
+	-oc create clusterrole \
+	  pr-cleaner \
 	  --verb=get,delete,list \
 	  --resource=pipeline,pipelinerun,task,taskrun
-	-oc adm policy add-role-to-user \
-	  tkn \
-	  -z default \
-	  --role-namespace=`oc project -q`
-	-oc apply -f $(BASE)/cronjob.yaml
+	-oc adm policy add-cluster-role-to-user \
+	  pr-cleaner \
+	  -z pr-cleaner \
+	  -n $(PROJ)
+	-oc apply -f $(BASE)/central_cronjob.yaml -n $(PROJ)
