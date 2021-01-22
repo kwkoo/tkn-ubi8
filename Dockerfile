@@ -1,4 +1,4 @@
-FROM registry.redhat.io/ubi8/ubi-minimal:8.3
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.3
 
 LABEL \
   maintainer="Koo Kin Wai <kin.wai.koo@gmail.com>" \
